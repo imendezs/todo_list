@@ -1,1 +1,35 @@
-{"flutter":{"platforms":{"android":{"default":{"projectId":"todolist-30552","appId":"1:574940851091:android:128e8430f8b2a3bccfd666","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"todolist-30552","configurations":{"android":"1:574940851091:android:128e8430f8b2a3bccfd666","ios":"1:574940851091:ios:e0ec6bcc8ba35dc9cfd666"}}}}}}
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "todolist-30552",
+          "appId": "1:574940851091:android:128e8430f8b2a3bccfd666",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "todolist-30552",
+          "configurations": {
+            "android": "1:574940851091:android:128e8430f8b2a3bccfd666",
+            "ios": "1:574940851091:ios:e0ec6bcc8ba35dc9cfd666"
+          }
+        }
+      }
+    }
+  },
+  "functions": [
+    {
+      "source": "functions",
+      "codebase": "default",
+      "ignore": [
+        "node_modules",
+        ".git",
+        "firebase-debug.log",
+        "firebase-debug.*.log",
+        "*.local"
+      ]
+    }
+  ]
+}
