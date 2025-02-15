@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:todo_list/providers/delete.dart';
+import 'package:todo_list/providers/delete_task_provider.dart';
+import 'package:todo_list/widgets/responsive_helper.dart';
 
 class DeleteTaskDialog extends StatelessWidget {
   final String taskId;
@@ -19,44 +20,41 @@ class DeleteTaskDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final taskProvider = Provider.of<Delete>(context);
+    final taskProvider = Provider.of<DeleteTaskProvider>(context);
+    final responsive = ResponsiveHelper(context);
 
     return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
-      elevation: 8,
-      child: Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-        ),
+      backgroundColor: Colors.white,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(responsive.borderRadiusMedium)),
+      child: Padding(
+        padding: EdgeInsets.all(responsive.paddingLarge),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
               "Eliminar Tarea",
               style: TextStyle(
-                fontSize: 20,
+                fontSize: responsive.textMedium,
                 fontWeight: FontWeight.bold,
-                color: Colors.red.shade700,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            SizedBox(height: 15),
-            Text(
-              "¿Estás seguro de eliminar la tarea?",
-              style: TextStyle(
-                fontSize: 16,
                 color: Colors.black54,
               ),
               textAlign: TextAlign.center,
             ),
-            SizedBox(height: 10),
+            SizedBox(height: responsive.spacingSmall),
+            Text(
+              "¿Estás seguro de eliminar la tarea?",
+              style: TextStyle(
+                fontSize: responsive.textSmall,
+                color: Colors.black54,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: responsive.spacingLarge),
             Container(
-              padding: EdgeInsets.all(15),
+              padding: EdgeInsets.all(responsive.paddingMedium),
               decoration: BoxDecoration(
                 color: Colors.grey[100],
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(responsive.borderRadiusMedium),
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -69,19 +67,19 @@ class DeleteTaskDialog extends StatelessWidget {
                         child: Text(
                           title,
                           style: TextStyle(
-                            fontSize: 16,
+                            fontSize: responsive.textMedium,
                             fontWeight: FontWeight.w600,
                             color: Colors.black87,
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
                       ),
-                      SizedBox(width: 8),
+                      SizedBox(width: responsive.spacingMedium),
                       Expanded(
                         child: Text(
                           taskDate,
                           style: TextStyle(
-                            fontSize: 14,
+                            fontSize: responsive.textSmall,
                             color: Colors.black54,
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -90,11 +88,11 @@ class DeleteTaskDialog extends StatelessWidget {
                       ),
                     ],
                   ),
-                  SizedBox(height: 8),
+                  SizedBox(height: responsive.spacingSmall),
                   Text(
                     description,
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: responsive.textSmall,
                       fontWeight: FontWeight.w300,
                       color: Colors.black54,
                     ),
@@ -102,18 +100,19 @@ class DeleteTaskDialog extends StatelessWidget {
                 ],
               ),
             ),
-            SizedBox(height: 20),
+            SizedBox(height: responsive.spacingLarge),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 TextButton(
                   onPressed: () => Navigator.pop(context),
                   style: TextButton.styleFrom(
                     foregroundColor: Colors.grey,
-                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    padding:
+                        EdgeInsets.symmetric(horizontal: responsive.paddingMedium, vertical: responsive.paddingSmall),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(responsive.borderRadiusSmall)),
                   ),
-                  child: Text("Cancelar", style: TextStyle(fontSize: 16)),
+                  child: Text("Cancelar", style: TextStyle(fontSize: responsive.textSmall)),
                 ),
                 TextButton(
                   onPressed: taskProvider.isButtonDisabled
@@ -125,15 +124,16 @@ class DeleteTaskDialog extends StatelessWidget {
                   style: TextButton.styleFrom(
                     foregroundColor: Colors.white,
                     backgroundColor: Colors.red.shade600,
-                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    padding:
+                        EdgeInsets.symmetric(horizontal: responsive.paddingMedium, vertical: responsive.paddingSmall),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(responsive.borderRadiusSmall)),
                   ),
                   child: taskProvider.isButtonDisabled
                       ? CircularProgressIndicator(
                           strokeWidth: 3,
                           valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                         )
-                      : Text("Eliminar", style: TextStyle(fontSize: 16)),
+                      : Text("Eliminar", style: TextStyle(fontSize: responsive.textSmall)),
                 ),
               ],
             ),

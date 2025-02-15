@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:todo_list/widgets/responsive_helper.dart';
 
 class LogoWithTitle extends StatelessWidget {
   final String title, subText;
@@ -13,37 +14,37 @@ class LogoWithTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final responsive = ResponsiveHelper(context);
+
     return SafeArea(
       child: LayoutBuilder(builder: (context, constraints) {
         return SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          padding: EdgeInsets.symmetric(horizontal: responsive.paddingLarge),
           child: Column(
             children: [
               SizedBox(height: constraints.maxHeight * 0.1),
-              Image.network(
-                "https://i.postimg.cc/nz0YBQcH/Logo-light.png",
-                height: 100,
+              Icon(
+                Icons.library_add_check_outlined,
+                color: const Color(0xFF00BF6D),
+                size: responsive.iconLogo,
               ),
-              SizedBox(height: constraints.maxHeight * 0.1),
+              SizedBox(height: constraints.maxHeight * 0.05),
               Text(
                 title,
-                style: Theme.of(context)
-                    .textTheme
-                    .headlineSmall!
-                    .copyWith(fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontSize: responsive.textExtraLarge,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(vertical: 16.0),
+                padding: EdgeInsets.symmetric(vertical: responsive.paddingSmall),
                 child: Text(
                   subText,
                   textAlign: TextAlign.center,
                   style: TextStyle(
+                    fontSize: responsive.textMedium,
                     height: 1.5,
-                    color: Theme.of(context)
-                        .textTheme
-                        .bodyLarge!
-                        .color!
-                        .withOpacity(0.64),
+                    color: Colors.black54.withOpacity(0.64),
                   ),
                 ),
               ),

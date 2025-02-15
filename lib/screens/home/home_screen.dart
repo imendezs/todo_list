@@ -5,6 +5,7 @@ import 'package:todo_list/widgets/home/add_task/add_task_dialog.dart';
 import 'package:todo_list/widgets/app_bar.dart';
 import 'package:todo_list/widgets/home/task_list.dart';
 import 'package:todo_list/services/home/task_service.dart';
+import 'package:todo_list/widgets/responsive_helper.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -13,23 +14,26 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser!;
     final taskService = TaskService();
+    final responsive = ResponsiveHelper(context);
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       backgroundColor: Colors.white,
       appBar: const CustomAppBar(),
       body: Padding(
-        padding: const EdgeInsets.only(top: 20),
+        padding: EdgeInsets.only(top: responsive.spacingMedium),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.all(15),
+              padding: EdgeInsets.all(responsive.paddingMedium),
               child: Text(
                 "Lista de tareas",
                 style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.black54),
+                  fontSize: responsive.textLarge,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.black54,
+                ),
               ),
             ),
             Expanded(

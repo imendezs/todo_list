@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:todo_list/screens/home/home_screen.dart';
 import 'package:todo_list/screens/login/login_screen.dart';
+import 'package:todo_list/services/login/auth_login.dart';
 import 'package:todo_list/widgets/logo_with_title.dart';
-import 'package:todo_list/services/login/auth.dart';
-import 'package:todo_list/widgets/login/button.dart';
-import 'package:todo_list/widgets/login/text_field.dart';
+import 'package:todo_list/widgets/login/login_button.dart';
+import 'package:todo_list/widgets/login/login_text_field.dart';
 import 'package:todo_list/widgets/snackbar.dart';
 
 class RegisterScreen extends StatelessWidget {
@@ -22,17 +21,17 @@ class RegisterScreen extends StatelessWidget {
       appBar: AppBar(backgroundColor: Colors.white),
       backgroundColor: Colors.white,
       body: LogoWithTitle(
-        title: "Registrar",
+        title: "To-Do List",
         children: [
           Form(
             key: _formKey,
             child: Column(
               children: [
-                AuthTextField(
+                LoginTextField(
                   hintText: "Correo",
                   onSaved: (value) => correo = value,
                 ),
-                AuthTextField(
+                LoginTextField(
                   hintText: "Contraseña",
                   obscureText: true,
                   onSaved: (value) => password = value,
@@ -40,7 +39,8 @@ class RegisterScreen extends StatelessWidget {
               ],
             ),
           ),
-          AuthButton(
+          SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+          LoginButton(
             text: "Registrar",
             onPressed: () async {
               if (_formKey.currentState!.validate()) {
@@ -70,9 +70,9 @@ class RegisterScreen extends StatelessWidget {
                   showCustomSnackBar(
                     context,
                     message: "Registro exitoso. Puede iniciar sesión para acceder a su cuenta.",
-                    colorPrincipal: Colors.green.shade600,
+                    colorPrincipal: Color(0xFF00BF6D),
                     colorIcon: Colors.white70,
-                    borderColor: Colors.green,
+                    borderColor: Color(0xFF00BF6D),
                     icon: Icons.check_circle,
                   );
                   Navigator.of(context).push(

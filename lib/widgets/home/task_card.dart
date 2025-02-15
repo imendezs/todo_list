@@ -1,7 +1,6 @@
-import 'dart:async';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:todo_list/widgets/delete_task_dialog.dart';
+import 'package:todo_list/widgets/responsive_helper.dart';
 import 'package:todo_list/widgets/update_edit_dialog.dart';
 
 class TaskCard extends StatefulWidget {
@@ -29,80 +28,84 @@ class TaskCard extends StatefulWidget {
 }
 
 class _TaskCardState extends State<TaskCard> {
-  bool _isButtonDisabled = false;
-
   @override
   Widget build(BuildContext context) {
+    final responsive = ResponsiveHelper(context);
+
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+      padding: EdgeInsets.symmetric(
+        vertical: responsive.spacingSmall,
+        horizontal: responsive.spacingMedium,
+      ),
       child: Container(
-        height: 130,
         decoration: BoxDecoration(
           color: Colors.grey.withOpacity(0.05),
-          borderRadius: BorderRadius.circular(15),
+          borderRadius: BorderRadius.circular(responsive.borderRadiusMedium),
         ),
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: EdgeInsets.all(responsive.paddingMedium),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Sección de contenido principal
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Estado
                     Container(
-                      constraints: BoxConstraints(minWidth: 100),
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      constraints: BoxConstraints(minWidth: responsive.containerWidthSmall),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: responsive.paddingMedium,
+                        vertical: responsive.paddingSmall,
+                      ),
                       decoration: BoxDecoration(
                         color: widget.color,
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius: BorderRadius.circular(responsive.borderRadiusSmall),
                       ),
                       child: Text(
                         widget.status,
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14),
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: responsive.textSmall,
+                        ),
                       ),
                     ),
-                    SizedBox(height: 12),
-                    // Título
+                    SizedBox(height: responsive.spacingMedium),
                     Row(
                       children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              (" ${widget.title}"),
-                              style: TextStyle(
-                                  fontSize: 18,
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                widget.title,
+                                style: TextStyle(
+                                  fontSize: responsive.textMedium * 0.9,
                                   fontWeight: FontWeight.w600,
-                                  color: Colors.black87),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            SizedBox(height: 4),
-                            Text(
-                              (" ${widget.taskDate}"),
-                              style: TextStyle(
-                                  fontSize: 14, color: Colors.grey[700]),
-                            ),
-                          ],
+                                  color: Colors.black87,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              SizedBox(height: responsive.spacingSmall),
+                              Text(
+                                widget.taskDate,
+                                style: TextStyle(
+                                  fontSize: responsive.textSmall,
+                                  color: Colors.grey[700],
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                        Spacer(),
+                        SizedBox(width: responsive.spacingSmall),
                         Row(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          mainAxisAlignment: MainAxisAlignment.end,
                           children: [
-                            IconButton(
-                              icon: Icon(Icons.edit,
-                                  size: 22,
-                                  color: Colors.blue.withOpacity(0.8)),
+                            _buildIconButton(
+                              icon: Icons.edit,
+                              color: Colors.blue,
                               onPressed: () {
                                 showDialog(
                                   context: context,
@@ -118,14 +121,12 @@ class _TaskCardState extends State<TaskCard> {
                                   },
                                 );
                               },
-                              style: ButtonStyle(
-                                backgroundColor: MaterialStateProperty.all(
-                                    Colors.blue.withOpacity(0.05)),
-                              ),
+                              responsive: responsive,
                             ),
-                            IconButton(
-                              icon: Icon(Icons.delete_rounded,
-                                  size: 22, color: Colors.red.withOpacity(0.8)),
+                            SizedBox(width: responsive.spacingSmall),
+                            _buildIconButton(
+                              icon: Icons.delete_rounded,
+                              color: Colors.red,
                               onPressed: () {
                                 showDialog(
                                   context: context,
@@ -140,10 +141,7 @@ class _TaskCardState extends State<TaskCard> {
                                   },
                                 );
                               },
-                              style: ButtonStyle(
-                                backgroundColor: MaterialStateProperty.all(
-                                    Colors.red.withOpacity(0.05)),
-                              ),
+                              responsive: responsive,
                             ),
                           ],
                         ),
@@ -155,6 +153,25 @@ class _TaskCardState extends State<TaskCard> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildIconButton({
+    required IconData icon,
+    required Color color,
+    required VoidCallback onPressed,
+    required ResponsiveHelper responsive,
+  }) {
+    return IconButton(
+      icon: Icon(
+        icon,
+        size: responsive.iconSmall * 1.2,
+        color: color.withOpacity(0.8),
+      ),
+      onPressed: onPressed,
+      style: ButtonStyle(
+        backgroundColor: MaterialStateProperty.all(color.withOpacity(0.05)),
       ),
     );
   }

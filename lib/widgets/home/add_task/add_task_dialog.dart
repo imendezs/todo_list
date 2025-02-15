@@ -2,10 +2,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:todo_list/models/task.dart';
-import 'package:todo_list/providers/task_provider.dart';
+import 'package:todo_list/providers/add_task_provider.dart';
 import 'package:todo_list/services/home/task_service.dart';
 import 'package:todo_list/screens/home/add_task/task_form.dart';
-import 'package:todo_list/widgets/home/add_task/task_form_controller.dart';
+import 'package:todo_list/utils/home/task_form_controller.dart';
+import 'package:todo_list/widgets/responsive_helper.dart';
 import 'package:todo_list/widgets/snackbar.dart';
 
 class AddTaskDialog extends StatefulWidget {
@@ -26,6 +27,8 @@ class _AddTaskDialogState extends State<AddTaskDialog> {
   }
 
   void _saveTask(BuildContext context) async {
+    final responsive = ResponsiveHelper(context);
+
     try {
       if (_controller.dateController.text.isEmpty) {
         showCustomSnackBar(
@@ -52,8 +55,8 @@ class _AddTaskDialogState extends State<AddTaskDialog> {
       }
 
       DateTime selectedDate = DateTime.parse(_controller.dateController.text);
-
       final user = FirebaseAuth.instance.currentUser;
+
       if (user == null) {
         showCustomSnackBar(
           context,
@@ -74,15 +77,15 @@ class _AddTaskDialogState extends State<AddTaskDialog> {
         userId: user.uid,
       );
 
-      final taskProvider = Provider.of<TaskProvider>(context, listen: false);
+      final taskProvider = Provider.of<AddTaskProvider>(context, listen: false);
       await _taskService.saveTask(task, taskProvider);
 
       showCustomSnackBar(
         context,
         message: "Tarea agregada exitosamente",
-        colorPrincipal: Colors.green.shade600,
+        colorPrincipal: Color(0xFF00BF6D),
         colorIcon: Colors.white70,
-        borderColor: Colors.green,
+        borderColor: Color(0xFF00BF6D),
         icon: Icons.check_circle,
       );
       Navigator.of(context).pop();
@@ -100,25 +103,72 @@ class _AddTaskDialogState extends State<AddTaskDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final taskProvider = Provider.of<AddTaskProvider>(context);
+    final responsive = ResponsiveHelper(context);
+
     return AlertDialog(
       backgroundColor: Colors.white,
-      title: const Text("Agregar Tarea"),
+      title: Text(
+        "Agregar Tarea",
+        style: TextStyle(fontSize: responsive.textLarge),
+      ),
       content: TaskForm(controller: _controller),
       actions: [
         TextButton(
-          style: ButtonStyle(
-            foregroundColor: MaterialStateProperty.all(const Color(0xFF00BF6D)),
+          onPressed: () => Navigator.pop(context),
+          style: TextButton.styleFrom(
+            foregroundColor: Colors.grey,
+            padding: EdgeInsets.symmetric(
+              horizontal: responsive.paddingMedium,
+              vertical: responsive.paddingSmall,
+            ),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(responsive.borderRadiusMedium),
+            ),
           ),
-          onPressed: () => Navigator.of(context).pop(),
-          child: const Text("Cancelar"),
+          child: Text(
+            "Cancelar",
+            style: TextStyle(fontSize: responsive.textSmall),
+          ),
         ),
-        ElevatedButton(
-          style: ButtonStyle(
-            backgroundColor: MaterialStateProperty.all(const Color(0xFF00BF6D)),
-            foregroundColor: MaterialStateProperty.all(Colors.white),
+        TextButton(
+          onPressed: taskProvider.isButtonDisabled
+              ? null
+              : () async {
+                  taskProvider.setButtonDisabled(true);
+                  try {
+                    final task = Task(
+                      title: _controller.titleController.text,
+                      description: _controller.descriptionController.text,
+                      status: _controller.selectedStatus,
+                      date: DateTime.parse(_controller.dateController.text),
+                      userId: FirebaseAuth.instance.currentUser?.uid ?? '',
+                    );
+
+                    await _taskService.saveTask(task, taskProvider);
+                    Navigator.pop(context);
+                  } catch (e) {
+                    print("Error al guardar la tarea: $e");
+                  } finally {
+                    taskProvider.setButtonDisabled(false);
+                  }
+                },
+          style: TextButton.styleFrom(
+            foregroundColor: Colors.white,
+            backgroundColor: Color(0xFF00BF6D),
+            padding: EdgeInsets.symmetric(horizontal: responsive.paddingMedium, vertical: responsive.paddingSmall),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(responsive.borderRadiusSmall)),
           ),
-          onPressed: () => _saveTask(context),
-          child: const Text("Guardar"),
+          child: taskProvider.isButtonDisabled
+              ? SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  ),
+                )
+              : Text("Guardar", style: TextStyle(fontSize: responsive.textSmall)),
         ),
       ],
     );

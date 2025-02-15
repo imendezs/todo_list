@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:todo_list/providers/update.dart';
-import 'package:todo_list/services/update_service.dart';
+import 'package:todo_list/providers/update_task_status_provider.dart';
+import 'package:todo_list/services/update_task_service.dart';
+import 'package:todo_list/widgets/responsive_helper.dart';
 
 class TaskEditDialog extends StatefulWidget {
   final String taskId;
@@ -11,13 +12,14 @@ class TaskEditDialog extends StatefulWidget {
   final String taskDate;
   final String currentStatus;
 
-  TaskEditDialog(
-      {required this.taskId,
-      required this.title,
-      required this.description,
-      required this.createdAt,
-      required this.taskDate,
-      required this.currentStatus});
+  TaskEditDialog({
+    required this.taskId,
+    required this.title,
+    required this.description,
+    required this.createdAt,
+    required this.taskDate,
+    required this.currentStatus,
+  });
 
   @override
   _TaskEditDialogState createState() => _TaskEditDialogState();
@@ -34,104 +36,135 @@ class _TaskEditDialogState extends State<TaskEditDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final taskProvider = Provider.of<UpdateTaskStatusProvider>(context);
+    final responsive = ResponsiveHelper(context);
+
     return Dialog(
       backgroundColor: Colors.white,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(responsive.borderRadiusMedium)),
       child: Padding(
-        padding: const EdgeInsets.all(20.0),
+        padding: EdgeInsets.all(responsive.paddingLarge),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text("Cambiar estado", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-            SizedBox(height: 20),
-            Column(
-              children: [
-                SizedBox(height: 10),
-                Container(
-                  padding: EdgeInsets.all(15),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[100],
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
+            Text(
+              "Cambiar estado",
+              style: TextStyle(
+                fontSize: responsive.textMedium,
+                fontWeight: FontWeight.bold,
+                color: Colors.black54,
+              ),
+            ),
+            SizedBox(height: responsive.spacingMedium),
+            Container(
+              padding: EdgeInsets.all(responsive.paddingMedium),
+              decoration: BoxDecoration(
+                color: Colors.grey[100],
+                borderRadius: BorderRadius.circular(responsive.borderRadiusMedium),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                            child: Text(
-                              widget.title,
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.black87,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
+                      Expanded(
+                        child: Text(
+                          widget.title,
+                          style: TextStyle(
+                            fontSize: responsive.textMedium,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black87,
+                            overflow: TextOverflow.ellipsis,
                           ),
-                          SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              widget.taskDate,
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.black54,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              textAlign: TextAlign.end,
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
-                      SizedBox(height: 8),
-                      Text(
-                        widget.description,
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w300,
-                          color: Colors.black54,
+                      SizedBox(width: responsive.spacingSmall),
+                      Expanded(
+                        child: Text(
+                          widget.taskDate,
+                          style: TextStyle(
+                            fontSize: responsive.textSmall,
+                            color: Colors.black54,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          textAlign: TextAlign.end,
                         ),
                       ),
                     ],
                   ),
-                ),
-                SizedBox(height: 20),
-                _buildStatusRadio(context, "Pendiente", selectedStatus, (value) {
-                  setState(() {
-                    selectedStatus = value!;
-                  });
-                }),
-                _buildStatusRadio(context, "Completada", selectedStatus, (value) {
-                  setState(() {
-                    selectedStatus = value!;
-                  });
-                }),
-              ],
+                  SizedBox(height: responsive.spacingSmall),
+                  Text(
+                    widget.description,
+                    style: TextStyle(
+                      fontSize: responsive.textSmall,
+                      fontWeight: FontWeight.w300,
+                      color: Colors.black54,
+                    ),
+                  ),
+                ],
+              ),
             ),
-            SizedBox(height: 20),
+            SizedBox(height: responsive.spacingSmall),
+            _buildStatusRadio("Pendiente", selectedStatus, (value) {
+              setState(() {
+                selectedStatus = value!;
+              });
+            }, responsive),
+            _buildStatusRadio("Completada", selectedStatus, (value) {
+              setState(() {
+                selectedStatus = value!;
+              });
+            }, responsive),
+            SizedBox(height: responsive.spacingSmall),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 TextButton(
                   onPressed: () => Navigator.pop(context),
-                  child: Text("Cancelar"),
+                  style: TextButton.styleFrom(
+                    foregroundColor: Colors.grey,
+                    padding:
+                        EdgeInsets.symmetric(horizontal: responsive.paddingMedium, vertical: responsive.paddingSmall),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(responsive.borderRadiusSmall)),
+                  ),
+                  child: Text("Cancelar", style: TextStyle(fontSize: responsive.textSmall)),
                 ),
-                ElevatedButton(
-                  onPressed: () async {
-                    if (selectedStatus != widget.currentStatus) {
-                      try {
-                        await UpdateService().updateTaskStatus(widget.taskId, selectedStatus);
-                      } catch (e) {
-                        print("Error updating status: $e");
-                      }
-                    } else {
-                      print("No changes to update.");
-                    }
-                    Navigator.pop(context);
-                  },
-                  child: Text("Guardar"),
+                TextButton(
+                  onPressed: taskProvider.isButtonDisabled
+                      ? null
+                      : () async {
+                          if (selectedStatus != widget.currentStatus) {
+                            taskProvider.setButtonDisabled(true);
+
+                            try {
+                              await UpdateTaskService().updateTaskStatus(widget.taskId, selectedStatus);
+                            } catch (e) {
+                              print("Error updating status: $e");
+                            }
+
+                            taskProvider.setButtonDisabled(false);
+                          }
+                          Navigator.pop(context);
+                        },
+                  style: TextButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    backgroundColor: Colors.blue.shade600,
+                    padding:
+                        EdgeInsets.symmetric(horizontal: responsive.paddingMedium, vertical: responsive.paddingSmall),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(responsive.borderRadiusSmall)),
+                  ),
+                  child: taskProvider.isButtonDisabled
+                      ? SizedBox(
+                          width: responsive.iconSmall,
+                          height: responsive.iconSmall,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 3,
+                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                          ),
+                        )
+                      : Text("Guardar", style: TextStyle(fontSize: responsive.textSmall)),
                 ),
               ],
             ),
@@ -141,13 +174,14 @@ class _TaskEditDialogState extends State<TaskEditDialog> {
     );
   }
 
-  Widget _buildStatusRadio(BuildContext context, String value, String groupValue, ValueChanged<String?> onChanged) {
+  Widget _buildStatusRadio(
+      String value, String groupValue, ValueChanged<String?> onChanged, ResponsiveHelper responsive) {
     return RadioListTile<String>(
-      title: Text(value),
+      title: Text(value, style: TextStyle(fontSize: responsive.textMedium)),
       value: value,
       groupValue: groupValue,
       onChanged: onChanged,
-      activeColor: Theme.of(context).primaryColor,
+      activeColor: Colors.blue.shade600,
     );
   }
 }

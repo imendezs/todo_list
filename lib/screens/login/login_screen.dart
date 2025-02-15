@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:todo_list/screens/home/home_screen.dart';
 import 'package:todo_list/widgets/logo_with_title.dart';
 import 'package:todo_list/screens/login/register_screen.dart';
-import 'package:todo_list/services/login/auth.dart';
-import 'package:todo_list/widgets/login/button.dart';
-import 'package:todo_list/widgets/login/text_field.dart';
+import 'package:todo_list/services/login/auth_login.dart';
+import 'package:todo_list/widgets/login/login_button.dart';
+import 'package:todo_list/widgets/login/login_text_field.dart';
+import 'package:todo_list/widgets/responsive_helper.dart';
 import 'package:todo_list/widgets/snackbar.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -16,29 +17,28 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
-
   final AuthLogin _auth = AuthLogin();
-
   String? correo;
-
   String? password;
 
   @override
   Widget build(BuildContext context) {
+    final responsive = ResponsiveHelper(context);
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: LogoWithTitle(
-        title: "Iniciar Sesión",
+        title: "To-Do List",
         children: [
           Form(
             key: _formKey,
             child: Column(
               children: [
-                AuthTextField(
+                LoginTextField(
                   hintText: "Correo",
                   onSaved: (value) => correo = value,
                 ),
-                AuthTextField(
+                LoginTextField(
                   hintText: "Contraseña",
                   obscureText: true,
                   onSaved: (value) => password = value,
@@ -46,7 +46,8 @@ class _LoginScreenState extends State<LoginScreen> {
               ],
             ),
           ),
-          AuthButton(
+          SizedBox(height: responsive.spacingMedium),
+          LoginButton(
             text: "Iniciar Sesión",
             onPressed: () async {
               if (_formKey.currentState!.validate()) {
@@ -78,23 +79,54 @@ class _LoginScreenState extends State<LoginScreen> {
                   Navigator.of(context).push(
                     MaterialPageRoute(builder: (context) => HomeScreen()),
                   );
-                } else if (result != null) {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => HomeScreen()),
-                  );
                 }
               } else {
                 print("El formulario no es válido");
               }
             },
           ),
+          SizedBox(height: responsive.containerHeightSmall),
           TextButton(
             onPressed: () {
               Navigator.of(context).push(
-                MaterialPageRoute(builder: (context) => RegisterScreen()),
+                PageRouteBuilder(
+                  transitionDuration: Duration(milliseconds: 500),
+                  pageBuilder: (context, animation, secondaryAnimation) {
+                    return FutureBuilder(
+                      future: Future.delayed(Duration(milliseconds: 600)),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState != ConnectionState.done) {
+                          return Container(color: Colors.white);
+                        }
+                        return RegisterScreen();
+                      },
+                    );
+                  },
+                  transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                    return FadeTransition(
+                      opacity: animation,
+                      child: child,
+                    );
+                  },
+                ),
               );
             },
-            child: Text("¿No tienes cuenta? Registrate"),
+            child: Text.rich(
+              TextSpan(
+                text: "¿No tienes cuenta? ",
+                style: TextStyle(color: Colors.black45, fontSize: responsive.textSmall),
+                children: [
+                  TextSpan(
+                    text: "Regístrate",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF00BF6D),
+                      fontSize: responsive.textSmall,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
         ],
       ),

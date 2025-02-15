@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:todo_list/widgets/home/add_task/task_form_controller.dart';
+import 'package:todo_list/utils/home/task_form_controller.dart';
+import 'package:todo_list/widgets/responsive_helper.dart';
 
 class TaskForm extends StatefulWidget {
   final TaskFormController controller;
@@ -13,6 +14,7 @@ class TaskForm extends StatefulWidget {
 class _TaskFormState extends State<TaskForm> {
   @override
   Widget build(BuildContext context) {
+    final responsive = ResponsiveHelper(context);
     return SingleChildScrollView(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -34,7 +36,11 @@ class _TaskFormState extends State<TaskForm> {
       controller: widget.controller.dateController,
       decoration: const InputDecoration(
         labelText: "Fecha",
-        suffixIcon: Icon(Icons.calendar_today),
+        labelStyle: TextStyle(color: Colors.black54),
+        suffixIcon: Icon(Icons.calendar_month),
+        focusedBorder: UnderlineInputBorder(
+          borderSide: BorderSide(color: Color(0xFF00BF6D), width: 2),
+        ),
       ),
       readOnly: true,
       onTap: () async {
@@ -67,19 +73,27 @@ class _TaskFormState extends State<TaskForm> {
   Widget _buildTextField(TextEditingController controller, String label, {int maxLines = 1}) {
     return TextField(
       controller: controller,
-      decoration: InputDecoration(labelText: label),
+      cursorColor: Color(0xFF00BF6D),
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: TextStyle(color: Colors.black54),
+        focusedBorder: UnderlineInputBorder(
+          borderSide: BorderSide(color: Color(0xFF00BF6D), width: 2),
+        ),
+      ),
       maxLines: maxLines,
     );
   }
 
   Widget _buildStatusSelector() {
+    final responsive = ResponsiveHelper(context);
     return Row(
       children: [
         Expanded(
           child: RadioListTile(
             contentPadding: EdgeInsets.zero,
             activeColor: const Color(0xFF00BF6D),
-            title: const Text("Pendiente"),
+            title: Text("Pendiente", style: TextStyle(fontSize: responsive.textSmall)),
             value: "Pendiente",
             groupValue: widget.controller.selectedStatus,
             onChanged: (value) {
@@ -93,7 +107,7 @@ class _TaskFormState extends State<TaskForm> {
           child: RadioListTile(
             contentPadding: EdgeInsets.zero,
             activeColor: const Color(0xFF00BF6D),
-            title: const Text("Completada"),
+            title: Text("Completada", style: TextStyle(fontSize: responsive.textSmall)),
             value: "Completada",
             groupValue: widget.controller.selectedStatus,
             onChanged: (value) {
